@@ -1,49 +1,27 @@
-# RAG PDF QA API
+# RAG Document & Web QA API
 
-A FastAPI-based RAG (Retrieval-Augmented Generation) API that lets you upload a PDF and ask questions about its content in English, using LangChain, ChromaDB for vector storage, HuggingFace embeddings, and Google's Gemini model for answer generation.
+A FastAPI-based RAG (Retrieval-Augmented Generation) API that lets you upload PDFs, Word documents (DOCX), or Web URLs and ask questions about their content. It uses LangChain, ChromaDB for persistent vector storage, HuggingFace embeddings, and Google's Gemini model for accurate, source-backed answer generation.
 
-## Features
+## 🚀 Features
 
-- Upload a PDF and index its content into a vector store
-- Ask natural language questions about the uploaded document
-- Answers are generated using only the document's content (RAG)
+- **Multi-Format Support:** Upload PDF files, DOCX files, or provide Web URLs.
+- **Smart Web Scraping:** Uses Trafilatura and BeautifulSoup to extract clean text from complex websites (like Wikipedia).
+- **Persistent Vector Store:** Documents are saved to a local `chroma_db` folder, meaning you don't lose your indexed files when the server restarts.
+- **Source Tracking:** Answers include the exact source (file name or URL) the information was retrieved from.
+- **Strict RAG (No Hallucination):** Answers are generated *strictly* using the uploaded context. If the information is missing, the AI explicitly states it.
+- **Multilingual/Turkish Support:** Capable of understanding questions and generating accurate responses in Turkish.
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-- FastAPI
-- LangChain
-- ChromaDB
-- HuggingFace Embeddings (`all-MiniLM-L6-v2`)
-- Google Gemini (`gemini-3.5-flash`)
+- **Framework:** FastAPI
+- **LLM Orchestration:** LangChain
+- **Vector Database:** ChromaDB
+- **Embeddings:** HuggingFace (`all-MiniLM-L6-v2`)
+- **LLM:** Google Gemini (`gemini-3.5-flash`)
+- **Web Scraping:** Trafilatura & BeautifulSoup4
 
-## Setup
+## ⚙️ Setup
 
-1. Clone the repository
-
-   git clone https://github.com/onuraslanhan/rag-pdf-qa-api.git
-   cd rag-pdf-qa-api
-
-2. Install dependencies
-
+1. **Install dependencies**
+   ```bash
    pip install -r requirements.txt
-
-3. Create a `.env` file in the project root and add your Google API key:
-
-   GOOGLE_API_KEY=your_api_key_here
-
-   You can get a free key at Google AI Studio (https://aistudio.google.com/apikey).
-
-4. Run the server
-
-   uvicorn LLM_API:app --reload
-
-5. Open http://127.0.0.1:8000/docs to test the endpoints.
-
-## Endpoints
-
-- POST /upload-pdf/ — Upload a PDF file to index
-- POST /ask-question/ — Ask a question about the uploaded PDF
-
-## License
-
-MIT
