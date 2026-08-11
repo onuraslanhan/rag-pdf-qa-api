@@ -82,6 +82,7 @@ async def upload_docx(file: UploadFile = File(...)):
             os.remove(file_path)
 
 def load_url_clean(url: str) -> list[Document]:
+    text = None
     downloaded = trafilatura.fetch_url(url)
     if downloaded:
         text = trafilatura.extract(downloaded)
@@ -111,12 +112,24 @@ async def upload_url(url: str = Form(...)):
 @app.post("/ask-question/")
 async def ask_question(question: str = Form(...)):
     store = get_or_create_vector_store()
-    retriever = store.as_retriever(search_kwargs={"k": 5})
     
-    retrieved_docs = retriever.invoke(question)
+    retrieved_docs_with_scores = store.similarity_search_with_relevance_scores(question, k=5)
+
+    for doc, score in retrieved_docs_with_scores:
+        print(f"Score: {score:.3f} | Source: {doc.metadata.get('source')} | Text: {doc.page_content[:80]}")
+
+    SCORE_THRESHOLD = 0.05
+    relevant_docs = [doc for doc, score in retrieved_docs_with_scores if score >= SCORE_THRESHOLD]
     
-    context = "\n\n".join(doc.page_content for doc in retrieved_docs)
-    sources = list(set(doc.metadata.get("source", "unknown") for doc in retrieved_docs))
+    if not relevant_docs:
+        return {
+            "question": question,
+            "answer": "That information is not available in the uploaded document.",
+            "sources": []
+        }
+    
+    context = "\n\n".join(doc.page_content for doc in relevant_docs)
+    sources = list(set(doc.metadata.get("source", "unknown") for doc in relevant_docs))
     
     system_prompt = (
         "You are a helpful assistant. Answer the question in English using ONLY the provided context. "
