@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import statistics
 from langchain_core.documents import Document
 from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File, Form
@@ -118,8 +119,14 @@ async def ask_question(question: str = Form(...)):
     for doc, score in retrieved_docs_with_scores:
         print(f"Score: {score:.3f} | Source: {doc.metadata.get('source')} | Text: {doc.page_content[:80]}")
 
-    SCORE_THRESHOLD = 0.05
-    relevant_docs = [doc for doc, score in retrieved_docs_with_scores if score >= SCORE_THRESHOLD]
+    scores = [score for doc, score in retrieved_docs_with_scores]
+    scores = [score for doc, score in retrieved_docs_with_scores]
+    max_score = max(scores)
+
+    relevant_docs = [
+        doc for doc, score in retrieved_docs_with_scores 
+        if score >= max_score * 0.7 and score > 0.02
+    ]
     
     if not relevant_docs:
         return {
