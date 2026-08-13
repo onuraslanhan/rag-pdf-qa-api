@@ -120,7 +120,6 @@ async def ask_question(question: str = Form(...)):
         print(f"Score: {score:.3f} | Source: {doc.metadata.get('source')} | Text: {doc.page_content[:80]}")
 
     scores = [score for doc, score in retrieved_docs_with_scores]
-    scores = [score for doc, score in retrieved_docs_with_scores]
     max_score = max(scores)
 
     relevant_docs = [
